@@ -5,6 +5,7 @@ from IPython import embed
 
 
 class Tracker:
+    RATIO = 2
     CASCADE_FILENAME = 'data/haarcascade_frontalface_default.xml'
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
@@ -16,10 +17,19 @@ class Tracker:
             (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
 
     def updateROIs(self, frame):
+        frame2 = frame.copy()
+        print(frame2.shape)
+        dim = (int(frame.shape[1] / self.RATIO), int(frame.shape[0] / self.RATIO))
+
+        resized = cv2.resize(frame2, dim, interpolation=cv2.INTER_AREA)
+        gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
         face_cascade = cv2.CascadeClassifier(self.CASCADE_FILENAME)
-        faces = face_cascade.detectMultiScale(frame, scaleFactor=1.1,
-            minNeighbors=5, minSize=(120,120))
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1,
+            minNeighbors=5, minSize=(30, 30))
+
         for (x, y, w, h) in faces:
+            x, y, w, h = x + 10, y + 10, w - 15, h - 15
+            x, y, w, h = x * self.RATIO, y * self.RATIO, w * self.RATIO, h * self.RATIO
             roi = frame[y : y + h, x : x + w]
             roi_hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
             roi_hist = cv2.calcHist([roi_hsv], [0], None, [180], [0, 180])
