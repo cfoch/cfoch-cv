@@ -6,7 +6,7 @@ from IPython import embed
 
 class Tracker:
     RATIO = 2
-    CASCADE_FILENAME = 'data/haarcascade_frontalface_default.xml'
+    CASCADE_FILENAME = 'data/haarcascade_mcs_nose.xml'
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
         self.tracking = False
@@ -23,11 +23,11 @@ class Tracker:
 
         resized = cv2.resize(frame2, dim, interpolation=cv2.INTER_AREA)
         gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-        face_cascade = cv2.CascadeClassifier(self.CASCADE_FILENAME)
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1,
+        nose_cascade = cv2.CascadeClassifier(self.CASCADE_FILENAME)
+        noses = nose_cascade.detectMultiScale(gray, scaleFactor=1.1,
             minNeighbors=5, minSize=(30, 30))
 
-        for (x, y, w, h) in faces:
+        for (x, y, w, h) in noses:
             x, y, w, h = x + 10, y + 10, w - 15, h - 15
             x, y, w, h = x * self.RATIO, y * self.RATIO, w * self.RATIO, h * self.RATIO
             roi = frame[y : y + h, x : x + w]
